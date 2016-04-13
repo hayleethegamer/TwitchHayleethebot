@@ -1,8 +1,32 @@
 from Socket import sendMessage
+import random
 
 def quote(message,user,s):
 	if " random" in message.lower():
 		sendMessage(s, "This is a work in progress")
+		givers = [" aurey ", " anne ", " secret "]
+		giver = random.sample(givers,1)
+		numChoose = 0
+		print(giver[0])
+		if giver[0] == " aurey ":
+			print ("ok")
+			num = [" 1"," 2"," 3"," 4"]
+			print (num)
+			numChoose = random.sample(num,1)
+			quote(giver + numChoose, user, s)
+			print(numChoose)
+		elif giver[0] == " anne ":
+			num = [" 1"," 2"," 3"," 4"," 5"]
+			print (num)
+			numChoose = random.sample(num,1)
+			quote(giver + numChoose, user, s)
+			print(numChoose)
+		elif giver[0] == " secret ":
+			num = [" 1"]
+			print (num)
+			numChoose = random.sample(num,1)
+			quote(giver + numChoose, user, s)
+			print(numChoose)
 
 	elif " help" in message.lower():
 		sendMessage(s, user + ", to use this command you need to enter a source and a number or description of a quote in my records. Example: '!quote haylee 1' You may also do a random quote with '!quote random'")
@@ -45,6 +69,7 @@ def quote(message,user,s):
 def dictionary(message,user,s):
 	if " random" in message.lower():
 		sendMessage(s, "This is a work in progress")
+		#recall with mess of randomly choicen option and number, user of user
 
 	elif " help" in message.lower():
 		sendMessage(s, user + ", to use this command you need to enter a source and a number or the word you wish to see that is in my records. Example: '!dictionary haylee 1' You may also get a random word using '!dictionary random'")
@@ -54,6 +79,9 @@ def dictionary(message,user,s):
 			sendMessage(s, 'Word: "Percentageally" Definition: "" Time: "Aureylian, 2016"')
 		else:
 			sendMessage(s, "Sorry " + user + " that is an invalid word or number, please try again.")
+	elif (" anne " in message.lower()) or (" annemunition " in message.lower()):
+		if (" 1" in message) or (" exspoiled" in message.lower()):
+			sendMessage(s, 'Word: "exspoiled" Definition: "Spoiled" Time: "Annemunition 2016"')
 	else:
 		sendMessage(s, "Sorry " + user + " that is an invalid source, please try again")
 			
