@@ -3,7 +3,7 @@ spamDetection = []
 spamDetectionNums = []
 started = False
 if started == False:
-	from Initalize import lastHourStart, lastMinuteStart
+	from Initialize import lastHourStart, lastMinuteStart
 	lastMinute = lastMinuteStart
 	lastHour = lastHourStart
 	started = True
@@ -12,7 +12,7 @@ async def twitchModing(message,message2,client,user,platform,trusted,tempWhiteli
 	global spamDetectionNums
 	global lastMinute
 	global lastHour
-	spam = spamDetection(message,message2,client,user,platform,spamDetection,spamDetectionNums)
+	spam = spamDetection(message,message2,client,user,platform)
 	if spam == True:
 		return
 	if " n.i.g.g.e.r" in message:
@@ -86,7 +86,7 @@ async def twitchModing(message,message2,client,user,platform,trusted,tempWhiteli
 				return
 
 
-async def spamDetection(message,message2,client,user,platform,spamDetection,spamDetectionNums,lastHour,lastMinute):
+async def spamDetection(message,message2,client,user,platform):
 	global lastMinute
 	global lastHour
 	global spamDetection
