@@ -91,7 +91,7 @@ async def spamDetection(message,message2,client,user,platform,spamDetection,spam
 	global lastHour
 	global spamDetection
 	global spamDetectionNums
-	if lastMinute = getPartTime("minute"):
+	if lastMinute == getPartTime("minute"):
 		spamDetectionSet = set(spamDetection)
 		userList = []
 		userList.append(user)
