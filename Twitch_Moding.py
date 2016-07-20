@@ -1,9 +1,9 @@
 from Functions import sendMessage, varChange, fileRead, fileWrite,removeLine, capsModding, getPartTime
-from Initalize import lastHourStart, lastMinuteStart
 spamDetection = []
 spamDetectionNums = []
 started = False
 if started == False:
+	from Initalize import lastHourStart, lastMinuteStart
 	lastMinute = lastMinuteStart
 	lastHour = lastHourStart
 	started = True
