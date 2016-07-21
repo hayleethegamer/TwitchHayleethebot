@@ -1,18 +1,13 @@
-from Functions import sendMessage, varChange, fileRead, fileWrite,removeLine, capsModding, getPartTime
-spamDetection = []
-spamDetectionNums = []
-started = False
-if started == False:
-	from Initialize import lastHourStart, lastMinuteStart
-	lastMinute = lastMinuteStart
-	lastHour = lastHourStart
-	started = True
+from Functions import sendMessage, varChange, fileRead, fileWrite,removeLine, capsModding, getPartTime, getTime, MessageObject
+spamDetection = {}
+
 async def twitchModing(message,message2,client,user,platform,trusted,tempWhitelist,mods,channel,autoCounter):
 	global spamDetection
 	global spamDetectionNums
 	global lastMinute
 	global lastHour
-	spam = spamDetection(message,message2,client,user,platform)
+	#await spamDetectionFunc(message,message2,client,user,platform)
+	spam = await spamDetectionFunc(message,message2,client,user,platform)
 	if spam == True:
 		return
 	if " n.i.g.g.e.r" in message:
@@ -67,7 +62,7 @@ async def twitchModing(message,message2,client,user,platform,trusted,tempWhiteli
 		elif len(filteredMessage.intersection(bottomGreyList)) > 0:
 			await sendMessage(message,client,platform, "Hey, don't hate cause there ass is better then your's" + user + ".")
 			return
-		print("test")
+		#print("return exit Test")
 	if channel == "John":
 		if ("can i join" in message.lower()) or ("could i join" in message.lower()) or ("can i play" in message.lower()) or ("can i play with you" in message.lower() or ("may I join" in message.lower())):
 			if autoCounter[0] == 0:
@@ -86,27 +81,18 @@ async def twitchModing(message,message2,client,user,platform,trusted,tempWhiteli
 				return
 
 
-async def spamDetection(message,message2,client,user,platform):
-	global lastMinute
-	global lastHour
+async def spamDetectionFunc(message,message2,client,user,platform):
 	global spamDetection
-	global spamDetectionNums
-	if lastMinute == getPartTime("minute"):
-		spamDetectionSet = set(spamDetection)
-		userList = []
-		userList.append(user)
-		userList = set(userList)
-		if len(user.intersection(spamDetection)) > 0:
-			common = userList.intersection(spamDetectionSet)
-			common = list(common)
-			indexNum = array.index(common[0])
-			if spamDetectionNums[indexNum] > 30:
-				await sendMessage(message,client,platform,"/timeout " + user + "60")
-				await sendMessage(message,client,platform,"Sorry " + user + " but we do not like spam here")
-				return True
-	else:
-		spamDetectionNums = []
-		spamDetection = []
+	MessageObject1 = MessageObject(user,message)
+	MessageObjectList = [(MessageObject1.user,MessageObject1.timeStamp)]
+	for k, v in MessageObjectList:
+		spamDetection.setdefault(k,[]).append(v)
+	print(spamDetection)
+	if len(spamDetection[MessageObject1.user]) > 15 and (MessageObject1.timeStamp - spamDetection[MessageObject1.user][0]).seconds < 30:
+		await sendMessage(message,client,platform,"/timeout " + user + " 60")
+		await sendMessage(message,client,platform,"Sorry " + user + " but we don't like spammers")
+	if len(spamDetection[MessageObject1.user]) > 15:
+		spamDetection[MessageObject1.user].pop(0)
 
 async def twitchOnlyCommands(message,message2,client,user,platform,trusted,channel,commandCounter):
 	if (message == "!timeoutm\r") and (commandCounter[0] == 0):

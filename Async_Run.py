@@ -2,6 +2,7 @@ import string
 import time
 from Read import getUser, getMessage, getTime
 from Socket import openSocket, sendMessage
+import Socket
 from Initialize import joinRoom
 from sys import argv
 import sys
@@ -14,6 +15,7 @@ import Twitch_Moding
 import sys
 import importlib
 import traceback
+from Settings import CHANNEL
 from Functions import codeWrite, fileRead
 
 s = openSocket()
@@ -29,11 +31,14 @@ loop = asyncio.get_event_loop()
 errors = 0
 stopped = 0
 osError = False
+autoCounter = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+commandCounter = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 
 
 async def runningChat():
 	while True:
 		try:
+			#print("startng try")
 			global greeted
 			global mods
 			global trusted
@@ -42,10 +47,14 @@ async def runningChat():
 			global errors
 			global stopped
 			global osError
+			global tempWhitelist
+			global autoCounter
+			global commandCounter
 			addBlame = 0
 			helped = 0
 		
 			readbuffer = readbuffer + s.recv(1024).decode()
+			#print(readbuffer)
 			#temp = string.split(readbuffer, "\n")
 			temp = readbuffer.split("\n")
 			readbuffer = temp.pop()
@@ -63,6 +72,20 @@ async def runningChat():
 				message = messageStuff
 				#tags = messageStuff[0]
 				message2 = message
+				countAutoCount = 0
+				countCommandCount = 0
+				while countAutoCount <= len(autoCounter)-1:
+					if autoCounter[countAutoCount] != 0:
+						autoCounter[countAutoCount] = autoCounter[countAutoCount] - 1
+					#print(countAutoCount)
+					#print(autoCounter[countAutoCount])
+					countAutoCount = countAutoCount + 1
+				while countCommandCount <= len(commandCounter)-1:
+					if commandCounter[countCommandCount] != 0:
+						commandCounter[countCommandCount] = commandCounter[countCommandCount] - 1
+					#print(countCommandCount)
+					#print(commandCounter[countCommandCount])
+					countCommandCount = countCommandCount + 1
 				print(getTime() + " " + user + ": " + message)
 				if (message.startswith("!reload")) and (user == "hayleethegamer"):
 					try:
@@ -77,13 +100,23 @@ async def runningChat():
 						stopped = 0
 					except:
 						sendMessage(s,"```" + str(sys.exc_info()[1]) + "```")
-				await Twitch_Moding.twitchModing(message,message2,s,user,platform)
-				if user in fileRead("Trusted.txt"):
-					await Twitch_Moding.twitchOnlyCommands(message,message2,s,user,platform)
+				if Socket.usedChannel == "hayleethegamer":
+					channel = "Haylee"
+				elif Socket.usedChannel == "ibanezfanjohn":
+					channel = "John"
+				else:
+					#sendMessage(s,"What the heck?")
+					channel = "Other"
+				mods = fileRead(channel + "/Mods.txt")
+				trusted = fileRead(channel + "/Trusted.txt")
+				if channel != "Other":
+					await Twitch_Moding.twitchModing(message,message2,s,user,platform,trusted,tempWhitelist,mods,channel,autoCounter)
+				if user in trusted or user in mods:
 					await Simple_Commands.simpleCommands(message,message2,s,user,platform)
 					await Chat_Commands.chatCommands(message,message2,s,user,addBlame,helped,platform)
-				await NonCommand_Chat.noncommandChat(message,message2,s,user,platform)
-				await Admin_Commands.adminCommands(message,message2,s,user,platform)
+				await Twitch_Moding.twitchOnlyCommands(message,message2,s,user,platform,trusted,channel,commandCounter)
+				await NonCommand_Chat.noncommandChat(message,message2,s,user,platform,channel)
+				await Admin_Commands.adminCommands(message,message2,s,user,platform,tempWhitelist,mods,channel)
 		except KeyboardInterrupt:
 			sendMessage(s,"I'm leaving now, later!")
 			sys.exit()
@@ -97,7 +130,10 @@ async def runningChat():
 				errorLength = len(sys.exc_info())
 				sendMessage(s,"There was a permissions Error or the file was not found, I do not have the rights to access this file.")
 				sendMessage(s,"``` " + str(traceback.format_exc()) + " ```")
-				codeWrite("Logs/Log1.txt", getTime() + " \r\n" + str(traceback.format_exc()) + "\r\n")
+				try:
+					codeWrite("Logs/Log1.txt", getTime() + " \r\n" + str(traceback.format_exc()) + "\r\n")
+				except (PermissionError, FileNotFoundError):
+					sendMessage(s,"Uh, I don't have permission to log this Error")
 		except OSError:
 			if osError == False:
 				osError = True
@@ -119,7 +155,11 @@ async def runningChat():
 				errorLength = len(sys.exc_info())
 				sendMessage(s,"``` " + str(sys.exc_info()[0:errorLength]) + " ``` \n There was a bug")
 				#sendMessage(s,"``` " + str(traceback.format_exc()) + " ```")
-				codeWrite("Logs/Log1.txt", getTime() + " \r\n" + str(traceback.format_exc()) + "\r\n")
+				try:
+					codeWrite("Logs/Log1.txt", getTime() + " \r\n" + str(traceback.format_exc()) + "\r\n")
+				except (PermissionError, FileNotFoundError):
+					sendMessage(s,"Uh, I don't have permission to log this Error")
+				
 
 #loop.run_forever()
 loop.run_until_complete(runningChat())

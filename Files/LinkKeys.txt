@@ -1,0 +1,7 @@
+http
+https
+.com
+.net
+.io
+.xyz
+www.

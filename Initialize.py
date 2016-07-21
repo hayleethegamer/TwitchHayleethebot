@@ -1,6 +1,9 @@
 import string
 from Chat_Commands import fileRead, varChange
 from Socket import sendMessage
+from Functions import getPartTime
+lastHourStart = ""
+lastMinuteStart = ""
 def joinRoom(s):
 	readbuffer = ""
 	Loading = True
@@ -16,8 +19,10 @@ def joinRoom(s):
 	if "reload = 0" in fileRead("Vars/Reload.txt"):
 		sendMessage(s, "Hello! I'm Hayleethebot, a bot made my Hayleethegamer!")
 		varChange("Reload.txt", "reload = 0")
+		lastHourStart = getPartTime("hour")
+		lastMinuteStart = getPartTime("minute")
 	else:
-		sendMessage(s, "Bot Reloaded")
+		sendMessage(s, "Bot Restarted")
 		varChange("Reload.txt", "reload = 0")
 	
 def loadingComplete(line):
